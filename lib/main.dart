@@ -16,7 +16,6 @@ class StudyTimerApp extends StatelessWidget {
   }
 }
 
-
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -38,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF317af2), 
+      backgroundColor: Color(0xFF317af2),
       body: Center(
         child: Image.asset(
           'images/logo.jpg',
@@ -70,8 +69,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void _submitLoginForm() {
     if (_formKey.currentState!.validate()) {
-      // Email and password validation logic
-      if (_emailController.text == 'farid@yahoo.com' && _passwordController.text == 'password123') {
+      if (_emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => StudyTimerScreen()),
@@ -102,13 +101,28 @@ class _LoginPageState extends State<LoginPage> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              const Expanded(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Study Timer App',
+                    style: TextStyle(
+                      fontSize: 44,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Roboto', // Custom font family, if desired
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  prefixIcon: Icon(Icons.email),
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -126,9 +140,12 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: _togglePasswordVisibility,
                   ),
@@ -142,14 +159,31 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 10),
               if (_isLoginFailed)
-                Text(
-                  'Invalid email or password',
-                  style: TextStyle(color: Colors.red),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'Invalid email or password',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
-              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitLoginForm,
                 child: Text('Login'),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text('Forgot Password?'),
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('Don\'t have an account?'),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text('Sign Up'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -164,10 +198,9 @@ class StudyTimerScreen extends StatefulWidget {
   _StudyTimerScreenState createState() => _StudyTimerScreenState();
 }
 
-
 class _StudyTimerScreenState extends State<StudyTimerScreen> {
   Timer? _timer;
-  int _studyDuration = 25; // Default study duration in minutes
+  int _studyDuration = 30; // Default study duration in minutes
   int _breakDuration = 5; // Default break duration in minutes
   late int _currentDuration = 0; // Initialize with 0
   String _timerText = '';
@@ -222,43 +255,54 @@ class _StudyTimerScreenState extends State<StudyTimerScreen> {
       appBar: AppBar(
         title: Text('Study Timer'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              _timerText,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Text(
-              _formatTime(_currentDuration),
-              style: TextStyle(fontSize: 40),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _startStudySession,
-                  child: Text('Start Study'),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white, // Warna latar belakang putih
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Color(0xFF317af2),
+                  width: 4, // Lebar border
                 ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: _startBreakSession,
-                  child: Text('Start Break'),
+              ),
+              child: Center(
+                child: Text(
+                  _formatTime(_currentDuration),
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ],
+              ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _resetTimer,
-              child: Text('Reset'),
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: _startStudySession,
+                child: Text('Start Study'),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: _startBreakSession,
+                child: Text('Start Break'),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _resetTimer,
+            child: Text('Reset'),
+          ),
+        ],
       ),
     );
   }
 }
-
